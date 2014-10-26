@@ -1,6 +1,8 @@
 import urllib.request
 import re
 import socket
+import readline
+import os
 
 
 #  输入基本信息
@@ -10,7 +12,7 @@ def input_info():
     input('按回车继续')
     print('输入抓取站点')
     site = input('输入kona或者yanre：')
-    print('是否要下载18X的图片')
+    print('是否要屏蔽18X的图片')
     safe = input('Y / N：')
     print('是否优先下载宽屏')
     wide = input('Y / N：')
