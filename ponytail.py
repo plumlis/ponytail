@@ -3,6 +3,30 @@ import re
 import socket
 
 
+#  输入基本信息
+def input_info():
+    print('Ponytail 图片抓取下载器')
+    print('#'*20)
+    input('按回车继续')
+    print('输入抓取站点')
+    site = input('输入kona或者yanre：')
+    print('是否要下载18X的图片')
+    safe = input('Y / N：')
+    print('是否优先下载宽屏')
+    wide = input('Y / N：')
+    print('输入你要下载的tag,之间用"+"分割')
+    tag = input('输入tag：')
+    print('是否只下载大图：')
+    width = input('Y / N：')
+    print('输入下载起始页：')
+    page_start = input('页码：')
+    print('输入下载结束页：')
+    page_end = input('页码：')
+    if not site or not page_start or not page_end or not tag:
+        return input_info()
+    return get_url(site, safe, width, wide, tag)
+
+"""
 #  设置基本参数
 site = 'kona'
 #  可用kona和yanre
@@ -14,10 +38,12 @@ tag = 'ponytail'
 #  网站的tag，可以用+分割，两边没有空格，当然你要确保这个tag是可用的
 width = True
 #  是否要下载大图
+"""
 page_start = 1
 #  下载起始页
 page_end = 37
-#  下载结束页
+##  下载结束页
+
 
 
 # 伪装浏览器，获取图片和网页
@@ -102,7 +128,7 @@ def error(o):
         return '未知错误'
 
 
-baseurl = get_url(site, safe, width, wide, tag)
+baseurl = input_info()
 total = 0
 for i in range(page_start, page_end):
     total += page_sheet(i)
