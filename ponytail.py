@@ -3,6 +3,7 @@ import re
 import socket
 import readline
 import os
+import sys
 
 
 #  输入基本信息
@@ -27,6 +28,25 @@ def input_info():
     if not site or not page_start or not page_end or not tag:
         return input_info()
     return get_url(site, safe, width, wide, tag)
+
+
+basedir = './myimg/'
+
+
+def progress(blocks, blocksize, total, width=100):
+#
+#  据说这玩意被称作回调函数
+#  blocks:就是下载了几块了
+#  blocksize:就是文件每块有多大
+#  total:就是文件一共有多大
+#
+    percentage = width * blocks * blocksize // total
+    if percentage > width:
+        percentage = width
+    # print(percentage * "#")
+    sys.stdout.write('[' + percentage * '#' + (width - percentage) * '-' + ']' + str(percentage * 100 // width) + '%' + '\r')
+    sys.stdout.flush()
+
 
 """
 #  设置基本参数
@@ -54,17 +74,21 @@ def user_agent(url, text):
     web_timeout = 30
     try:
         req = urllib.request.Request(url, None, web_header)
-        fp = urllib.request.urlopen(req, None, web_timeout)
-        page = fp.read()
         # 抓网页用text,抓图片走单独的
         if text:
+            fp = urllib.request.urlopen(req, None, web_timeout)
+            page = fp.read()
             html = page.decode('utf8')
+            fp.close()
         else:
-            html = page
-        fp.close()
+            dir = basedir + url[-11:]
+            urllib.request.urlretrieve(url, dir, progress)
+            print()
+            html = 'picgot'
     except urllib.error.URLError as error:
         print(error.message)
     except socket.timeout as error:
+        html = ''
         user_agent(url)
     return html
 
@@ -72,7 +96,7 @@ def user_agent(url, text):
 # 解析图片地址并抓取图片
 def get_img(url):
     getlink = url.replace("\\/", "/")
-    print('Now getting {link}'.format(link=getlink))
+    print('Now getting:\n {link}'.format(link=getlink))
     finalimg = user_agent(getlink, text=False)
     return finalimg
 
@@ -80,7 +104,7 @@ def get_img(url):
 # 通过URL地址得到图片地址然后完成存储
 def page_sheet(pageid):
     url = baseurl+'&page={id}'.format(id=pageid)
-    print ('Now we are tracking:/n {url}'.format(url=url))
+    print ('Now we are tracking: \n {url}'.format(url=url))
     page = user_agent(url, text='True')
     #  print(page)
     findimg = 0
@@ -89,10 +113,10 @@ def page_sheet(pageid):
     for ponytailimg in list:
         finalimg = get_img(ponytailimg)
         findimg += 1
-        # 借鉴来的，比自己写的逼格高一点
-        with open('./myimg'+'/'+ponytailimg[-11:], 'wb') as code:
-            code.write(finalimg)
-        print(findimg)
+        if finalimg == 'picgot':
+            print('第{findimg}张图抓取完成'.format(findimg=findimg))
+        else:
+            print('第{findimg}张图抓取失败'.format(findimg=findimg))
     return findimg
 
 
@@ -130,8 +154,10 @@ def error(o):
         return '未知错误'
 
 
-baseurl = input_info()
-total = 0
-for i in range(page_start, page_end):
-    total += page_sheet(i)
-print ('Got {total}'.format(total=total))
+# 运行方式
+if __name__ == '__main__':
+    baseurl = input_info()
+    total = 0
+    for i in range(page_start, page_end):
+        total += page_sheet(i)
+    print ('Got {total}'.format(total=total))
