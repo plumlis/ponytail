@@ -1,0 +1,16 @@
+[catcher]
+tag = ponytail
+safe = False
+threads = 1
+;大小设置
+;1 - 1680X1050及其以上
+;2 - 1920X1080及其以上
+;3 - 其他
+width = 1
+wide = True
+
+[navigator]
+page_start = 1
+page_end = 1
+Autonav = False
+
